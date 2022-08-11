@@ -1,0 +1,30 @@
+type: remote_edu
+files:
+- name: main.go
+  visible: true
+  text: "package main\n\nfunc main() {\n\t// write your code here\n}\n"
+  learner_created: false
+- name: tests.py
+  visible: false
+  text: |
+    from hstest import *
+
+
+    class CoffeeMachineTest(StageTest):
+        @dynamic_test
+        def empty_test(self):
+            p = TestedProgram()
+            p.start()
+            if p.is_finished():
+                return wrong("Your program should not terminate "
+                             "immediately after starting")
+            return correct()
+
+
+    if __name__ == '__main__':
+        CoffeeMachineTest().run_tests()
+  learner_created: false
+feedback_link: https://hyperskill.org/projects/194/stages/970/implement#comment
+check_profile: hyperskill_go
+status: Unchecked
+record: -1
