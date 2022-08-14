@@ -38,10 +38,10 @@ files:
     if __name__ == '__main__':
         CoffeeMachineTest().run_tests()
   learner_created: false
-feedback_link: https://hyperskill.org/projects/194/stages/965/implement#comment
+feedback_link: https://hyperskill.org/learn/step/14002#comment
 check_profile: hyperskill_go
 status: Solved
 feedback:
   message: <html>Correct solution</html>
   time: Thu, 11 Aug 2022 20:14:28 UTC
-record: -1
+record: 1
