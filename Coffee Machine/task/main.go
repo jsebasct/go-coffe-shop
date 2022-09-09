@@ -12,6 +12,8 @@ type CoffeeMachine struct {
 	money          int
 }
 
+var coffeeResources = make(map[int]CoffeeMachine)
+
 func (machine *CoffeeMachine) GetStatus() string {
 	a := fmt.Sprintf("The coffee machine has:\n%d ml of water\n", machine.waterML)
 	b := fmt.Sprintf("%d ml of milk\n%d g of coffee beans\n", machine.milkML, machine.coffeeBeansGR)
@@ -20,24 +22,24 @@ func (machine *CoffeeMachine) GetStatus() string {
 }
 
 func (machine *CoffeeMachine) BuyExpresso() {
-	machine.waterML = machine.waterML - 250
-	machine.coffeeBeansGR = machine.coffeeBeansGR - 16
+	machine.waterML -= 250
+	machine.coffeeBeansGR -= 16
 	machine.money += 4
 	machine.disposableCups -= 1
 }
 
 func (machine *CoffeeMachine) BuyLatte() {
-	machine.waterML = machine.waterML - 350
+	machine.waterML -= 350
 	machine.milkML -= 75
-	machine.coffeeBeansGR = machine.coffeeBeansGR - 20
+	machine.coffeeBeansGR -= 20
 	machine.money += 7
 	machine.disposableCups -= 1
 }
 
 func (machine *CoffeeMachine) BuyCappuccino() {
-	machine.waterML = machine.waterML - 200
+	machine.waterML -= 200
 	machine.milkML -= 100
-	machine.coffeeBeansGR = machine.coffeeBeansGR - 12
+	machine.coffeeBeansGR -= 12
 	machine.money += 6
 	machine.disposableCups -= 1
 }
@@ -55,10 +57,40 @@ func (machine *CoffeeMachine) TakeMoney() int {
 	return money
 }
 
+func (machine *CoffeeMachine) HasEnoughResources(coffeeType int) bool {
+	resource, exists := coffeeResources[coffeeType]
+
+	if exists {
+		if machine.waterML < resource.waterML {
+			fmt.Println("Sorry, not enough water!")
+			return false
+		}
+		if machine.milkML < resource.milkML {
+			fmt.Println("Sorry, not enough milk!")
+			return false
+		}
+		if machine.coffeeBeansGR < resource.coffeeBeansGR {
+			fmt.Println("Sorry, not enough coffee beans!")
+			return false
+		}
+		if machine.disposableCups == 0 {
+			fmt.Println("Sorry, not enough disposable cups!")
+			return false
+		}
+		return true
+	} else {
+		fmt.Println("Type of Coffee Choosed DOES NOT EXIST")
+		return false
+	}
+
+}
+
 const (
-	Buy  string = "buy"
-	Fill        = "fill"
-	Take        = "take"
+	Buy       string = "buy"
+	Fill             = "fill"
+	Take             = "take"
+	Remaining        = "remaining"
+	Exit             = "exit"
 )
 
 const (
@@ -66,6 +98,32 @@ const (
 	Late           = 2
 	Cappuccino     = 3
 )
+
+func initCoffeeResources() {
+	coffeeResources[Expresso] = CoffeeMachine{
+		waterML:        250,
+		milkML:         0,
+		coffeeBeansGR:  16,
+		money:          4,
+		disposableCups: 1,
+	}
+
+	coffeeResources[Late] = CoffeeMachine{
+		waterML:        350,
+		milkML:         75,
+		coffeeBeansGR:  20,
+		money:          7,
+		disposableCups: 1,
+	}
+
+	coffeeResources[Cappuccino] = CoffeeMachine{
+		waterML:        200,
+		milkML:         100,
+		coffeeBeansGR:  12,
+		money:          6,
+		disposableCups: 1,
+	}
+}
 
 func main() {
 	machine := CoffeeMachine{
@@ -75,22 +133,29 @@ func main() {
 		disposableCups: 9,
 		money:          550,
 	}
-	fmt.Println(machine.GetStatus())
 
-	var action = ""
-	fmt.Println("Write action (buy, fill, take):")
-	fmt.Scan(&action)
+	initCoffeeResources()
 
-	// TODO check if valid action
-	if action == Buy {
-		buyCoffeeAction(&machine)
-	} else if action == Fill {
-		fillAction(&machine)
-	} else if action == Take {
-		moneyTaken := machine.TakeMoney()
-		fmt.Printf("I have you $%d/n", moneyTaken)
+	for {
+		var action = ""
+		fmt.Println("Write action (buy, fill, take, remaining, exit):")
+		fmt.Scan(&action)
+
+		if action == Buy {
+			buyCoffeeAction(&machine)
+		} else if action == Fill {
+			fillAction(&machine)
+		} else if action == Take {
+			moneyTaken := machine.TakeMoney()
+			fmt.Printf("I gave you $%d\n", moneyTaken)
+		} else if action == Remaining {
+			fmt.Println(machine.GetStatus())
+		} else if action == Exit {
+			break
+		} else {
+			fmt.Println("Action does not exist")
+		}
 	}
-	fmt.Println(machine.GetStatus())
 }
 
 func fillAction(machine *CoffeeMachine) {
@@ -114,18 +179,23 @@ func fillAction(machine *CoffeeMachine) {
 }
 
 func buyCoffeeAction(machine *CoffeeMachine) {
-	fmt.Println("What do you want to buy? 1 - expresso, 2 - latte, 3 - cappucino")
+	fmt.Println("What do you want to buy? 1 - expresso, 2 - latte, 3 - cappucino, back - to main menu")
 	var coffeeType = 0
 	fmt.Scan(&coffeeType)
 
-	// evaluate
-	if coffeeType == Expresso {
-		machine.BuyExpresso()
-	} else if coffeeType == Late {
-		machine.BuyLatte()
-	} else if coffeeType == Cappuccino {
-		machine.BuyCappuccino()
-	} else {
-		fmt.Println("unkonw action")
+	// TODO check if machine has enought supplies
+	if machine.HasEnoughResources(coffeeType) {
+		fmt.Println("I have enough resources, making you a coffee!")
+		// evaluate
+		if coffeeType == Expresso {
+			machine.BuyExpresso()
+		} else if coffeeType == Late {
+			machine.BuyLatte()
+		} else if coffeeType == Cappuccino {
+			machine.BuyCappuccino()
+		} else {
+			fmt.Println("unkonw action")
+		}
 	}
+
 }
