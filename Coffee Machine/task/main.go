@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 )
 
 type CoffeeMachine struct {
@@ -180,21 +181,25 @@ func fillAction(machine *CoffeeMachine) {
 
 func buyCoffeeAction(machine *CoffeeMachine) {
 	fmt.Println("What do you want to buy? 1 - expresso, 2 - latte, 3 - cappucino, back - to main menu")
-	var coffeeType = 0
-	fmt.Scan(&coffeeType)
+	var optionChosed = ""
+	fmt.Scan(&optionChosed)
 
-	// TODO check if machine has enought supplies
-	if machine.HasEnoughResources(coffeeType) {
-		fmt.Println("I have enough resources, making you a coffee!")
-		// evaluate
-		if coffeeType == Expresso {
-			machine.BuyExpresso()
-		} else if coffeeType == Late {
-			machine.BuyLatte()
-		} else if coffeeType == Cappuccino {
-			machine.BuyCappuccino()
-		} else {
-			fmt.Println("unkonw action")
+	if optionChosed != "back" {
+
+		coffeeType, _ := strconv.Atoi(optionChosed)
+
+		if machine.HasEnoughResources(coffeeType) {
+			fmt.Println("I have enough resources, making you a coffee!")
+			// evaluate
+			if coffeeType == Expresso {
+				machine.BuyExpresso()
+			} else if coffeeType == Late {
+				machine.BuyLatte()
+			} else if coffeeType == Cappuccino {
+				machine.BuyCappuccino()
+			} else {
+				fmt.Println("unkonw action")
+			}
 		}
 	}
 
